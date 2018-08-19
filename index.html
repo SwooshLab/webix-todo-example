@@ -1,0 +1,85 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <link rel="stylesheet" href="node_modules/webix/webix.css" type="text/css">
+    <script src="node_modules/webix/webix.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+    <style>
+        .check {
+            float: right;
+            margin: 7px;
+        }
+
+        .check:hover {
+            color: #3498db;
+        }
+    </style>
+
+    <script type="text/javascript" charset="utf-8">
+
+        const title = "Simple Todo App";
+
+        const todo_list = ['All', 'Active', 'Compleated'];
+        const all_todos = [
+            { text: 'wash dog', checked: 1 },
+            { text: 'pay bills', checked: 0 },
+            { text: 'buy tickets', checked: 0 },
+        ];
+
+        var selected_todos = all_todos;
+
+        webix.ready(() => {
+            webix.ui({
+                rows: [
+                    {
+                        view: "template", type: "header", template: title
+                    },
+                    {
+                        cols: [
+                            {
+                                view: "list", id: "menu", gravity: 0.3, select: true, data: todo_list,
+                                on: {
+                                    "onItemClick": function(e, id) {
+                                        selected_todos = all_todos.filter(_ => _.checked == 1);
+                                    }
+                                }
+                            },
+                            { view: "resizer" },
+                            {
+                                view: "list", id: "todo_list_view", autoConfig: true, type: {
+                                    checked: function (obj) {
+                                        return "<span class='check webix_icon fa-" + (obj.checked ? "check-" : "") + "square-o'></span>";
+                                    }
+                                },
+                                onClick: {
+                                    "check": function (e, id) {
+                                        var item = this.getItem(id);
+                                        item.checked = item.checked ? 0 : 1;
+                                        this.updateItem(id, item);
+                                    }
+                                },
+                                template: "#text#{common.checked()}",
+                                data: selected_todos
+                            }
+                        ]
+                    }
+
+                ]
+
+            });
+
+            console.log($$("todo_list_view"));
+
+            $$("todo_list_view").data.sync(selected_todos);
+        });
+
+        document.title = title;
+
+    </script>
+</body>
+
+</html>
