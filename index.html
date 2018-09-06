@@ -43,8 +43,20 @@
                             {
                                 view: "list", id: "menu", gravity: 0.3, select: true, data: todo_list,
                                 on: {
-                                    "onItemClick": function(e, id) {
-                                        selected_todos = all_todos.filter(_ => _.checked == 1);
+                                    "onItemClick": function (id) {
+                                        switch (id) {
+                                            case 'All':
+                                                selected_todos = all_todos;
+                                                break;
+                                            case 'Active':
+                                                selected_todos = all_todos.filter(_ => _.checked == 0);
+                                                break;
+                                            case 'Compleated':
+                                                selected_todos = all_todos.filter(_ => _.checked == 1);
+                                                break;
+                                        }
+                                        $$("todo_list_view").data.clearAll();
+                                        $$("todo_list_view").parse(selected_todos);
                                     }
                                 }
                             },
@@ -71,10 +83,6 @@
                 ]
 
             });
-
-            console.log($$("todo_list_view"));
-
-            $$("todo_list_view").data.sync(selected_todos);
         });
 
         document.title = title;
