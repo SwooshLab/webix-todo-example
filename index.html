@@ -24,11 +24,11 @@
         const title = "Simple Todo App";
 
         const todo_list = ['All', 'Active', 'Compleated'];
-        const all_todos = [
-            { text: 'wash dog', checked: 1 },
-            { text: 'pay bills', checked: 0 },
-            { text: 'buy tickets', checked: 0 },
-        ];
+
+        let all_todos = JSON.parse(localStorage.getItem('all_todos'));
+
+        if (all_todos === null)
+            all_todos = [];
 
         var selected_todos = all_todos;
 
@@ -62,20 +62,44 @@
                             },
                             { view: "resizer" },
                             {
-                                view: "list", id: "todo_list_view", autoConfig: true, type: {
-                                    checked: function (obj) {
-                                        return "<span class='check webix_icon fa-" + (obj.checked ? "check-" : "") + "square-o'></span>";
+                                rows: [
+                                    {
+                                        view: "list", id: "todo_list_view", autoConfig: true, type: {
+                                            checked: function (obj) {
+                                                return "<span class='check webix_icon fa-" + (obj.checked ? "check-" : "") + "square-o'></span>";
+                                            }
+                                        },
+                                        onClick: {
+                                            "check": function (e, id) {
+                                                var item = this.getItem(id);
+                                                item.checked = item.checked ? 0 : 1;
+                                                this.updateItem(id, item);
+                                                localStorage.setItem("all_todos", JSON.stringify(all_todos))
+
+                                            }
+                                        },
+                                        template: "#text#{common.checked()}",
+                                        data: selected_todos
+                                    },
+                                    {
+                                        cols: [
+                                            { view: "text", label: "New todo: ", placeholder: "Type your todo", id: "newTodo" },
+                                            {
+                                                view: "button", value: "add", gravity: 0.3,
+                                                on: {
+                                                    onItemClick: function () {
+                                                        const newTodo = { text: $$("newTodo").getValue(), checked: 0 };
+                                                        $$("newTodo").setValue("");
+                                                        selected_todos.push(newTodo);
+                                                        $$("todo_list_view").data.clearAll();
+                                                        $$("todo_list_view").parse(selected_todos);
+                                                        localStorage.setItem("all_todos", JSON.stringify(all_todos))
+                                                    }
+                                                }
+                                            }
+                                        ]
                                     }
-                                },
-                                onClick: {
-                                    "check": function (e, id) {
-                                        var item = this.getItem(id);
-                                        item.checked = item.checked ? 0 : 1;
-                                        this.updateItem(id, item);
-                                    }
-                                },
-                                template: "#text#{common.checked()}",
-                                data: selected_todos
+                                ]
                             }
                         ]
                     }
